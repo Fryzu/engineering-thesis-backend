@@ -1,0 +1,20 @@
+{
+  "name": "EngineeringThesisBackend",
+  "version": "1.0.0",
+  "description": "Backend repo of my engineering thesis project - System for WebRTC based video broadcasting.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": "https://github.com/Fryzu/EngineeringThesisBackend.git",
+  "author": "Fryzu <bartek.fryz@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "websocket": "^1.0.30"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  }
+}
