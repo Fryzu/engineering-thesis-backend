@@ -16,5 +16,5 @@ io.on("connect", handleWebSocketConnections);
 app.use(router);
 
 server.listen(SERVER_PORT, () => {
-  console.log("Server runs on port", SERVER_PORT);
+  console.log("Server starts on port", SERVER_PORT);
 });
