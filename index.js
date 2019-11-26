@@ -1,13 +1,20 @@
 const express = require("express");
+const http = require("http");
+const socketio = require("socket.io");
+const { SERVER_PORT } = require("./config");
+const router = require("./router");
+const { handleWebSocketConnections } = require("./sockets");
 
-const PORT = 5000;
-
+// Creating app and server
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
-app.get("/api/test", (_, res) => {
-  res.json(["raz", "dwa", "trzy"]);
-});
+// Handling WebSockets connections
+io.on("connect", handleWebSocketConnections);
 
-app.listen(PORT, () => {
-  console.warn("Server runs on port", PORT);
+app.use(router);
+
+server.listen(SERVER_PORT, () => {
+  console.log("Server runs on port", SERVER_PORT);
 });
