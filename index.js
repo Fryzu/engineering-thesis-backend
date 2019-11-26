@@ -3,7 +3,7 @@ const http = require("http");
 const socketio = require("socket.io");
 const { SERVER_PORT } = require("./config");
 const router = require("./router");
-const { handleWebSocketConnections } = require("./sockets");
+const { handleWebSocketConnections } = require("./sockets/sockets");
 
 // Creating app and server
 const app = express();
