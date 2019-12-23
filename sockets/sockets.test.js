@@ -76,9 +76,18 @@ describe("Signaling server websockets API tests", function() {
       }
     });
   });
+
+  it("Should open new channels", async () => {
+    const channelName = "channelName";
+    await expect(
+      fetch(eventTypes.OPEN_CHANNEL, { channelName })
+    ).resolves.toMatchObject({
+      status: HTTP_OK
+    });
+  });
 });
 
-describe("Signaling server auxiliary functions", function() {
+describe("Signaling server auxiliary functions tests", function() {
   it("Should send messages to users", () => {
     const userName1 = "testUser1";
     const socketId1 = "111";
