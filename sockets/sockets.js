@@ -2,14 +2,17 @@ const { addUser } = require("../state/users");
 
 const eventTypes = {
   TEST: "test",
-  NEW_USER: "newUser"
+  NEW_USER: "addUser"
 };
+
+const HTTP_OK = 200;
+const HTTP_BAD_REQUEST = 400;
 
 function handleWebSocketConnections(socket) {
   console.log(`New connection on socket ${socket.id}`);
 
   socket.use((packet, next) => {
-    console.log("Incoming packet", packet);
+    console.log("Request: ", packet);
     next();
   });
 
@@ -23,8 +26,15 @@ function handleWebSocketConnections(socket) {
     try {
       const { userName } = payload;
       addUser(socket.id, userName);
+      callback({
+        status: HTTP_OK,
+        message: "User has been added succesfully"
+      });
     } catch (error) {
-      callback(error);
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
     }
   });
 }

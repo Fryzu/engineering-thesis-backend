@@ -7,6 +7,7 @@ const users = {};
  */
 const addUser = (socketID, userName) => {
   if (socketID in users) throw "User already exists";
+  if (!userName) throw "Incorrect name";
 
   users[socketID] = {
     userName
