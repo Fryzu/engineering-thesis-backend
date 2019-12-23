@@ -24,6 +24,10 @@ const deleteUser = socketID => {
   delete users[socketID];
 };
 const getUser = () => {};
-const getUsersList = () => {};
+const getUsersList = () => {
+  return Object.keys(users).map(user => {
+    return users[user].userName;
+  });
+};
 
 module.exports = { addUser, deleteUser, getUser, getUsersList };

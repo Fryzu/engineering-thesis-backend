@@ -1,8 +1,10 @@
-const { addUser, deleteUser } = require("../state/users");
+const { addUser, deleteUser, getUsersList } = require("../state/users");
 
 const eventTypes = {
   TEST: "test",
-  NEW_USER: "addUser"
+  NEW_USER: "addUser",
+  GET_USER_LIST: "getUserList",
+  SEND_TO_USER: "sendToUser"
 };
 
 const HTTP_OK = 200;
@@ -20,7 +22,9 @@ function handleWebSocketConnections(socket) {
     const { id } = socket;
     try {
       deleteUser(id);
-    } catch {}
+    } catch (error) {
+      console.log(`Disconnection error: ${error}`);
+    }
   });
 
   socket.on(eventTypes.TEST, ({ testMessage }, callback) => {
@@ -33,7 +37,26 @@ function handleWebSocketConnections(socket) {
       addUser(socket.id, userName);
       callback({
         status: HTTP_OK,
-        message: "User has been added succesfully"
+        message: "User has been added successfuly"
+      });
+    } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.GET_USER_LIST, (_, callback) => {
+    try {
+      const users = getUsersList();
+      console.warn(users);
+      callback({
+        status: HTTP_OK,
+        message: "Successful user list get",
+        payload: {
+          users
+        }
       });
     } catch (error) {
       callback({
@@ -44,4 +67,4 @@ function handleWebSocketConnections(socket) {
   });
 }
 
-module.exports = { handleWebSocketConnections };
+module.exports = { handleWebSocketConnections, eventTypes };

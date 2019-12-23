@@ -1,4 +1,5 @@
 const io = require("socket.io-client");
+const { eventTypes } = require("./sockets");
 
 const HTTP_OK = 200;
 const HTTP_BAD_REQUEST = 400;
@@ -35,19 +36,43 @@ describe("Signaling server websockets API tests", function() {
 
   it("Should reponse to test onHandler", async () => {
     const testMessage = "oneToThree";
-    await expect(fetch("test", { testMessage })).resolves.toBe(testMessage);
+    await expect(fetch(eventTypes.TEST, { testMessage })).resolves.toBe(
+      testMessage
+    );
   });
 
   it("Should should add new users", async () => {
     const userName = "testUser";
-    await expect(fetch("addUser", { userName })).resolves.toMatchObject({
+    await expect(
+      fetch(eventTypes.NEW_USER, { userName })
+    ).resolves.toMatchObject({
       status: HTTP_OK
     });
-    await expect(fetch("addUser", { userName })).resolves.toMatchObject({
+    await expect(
+      fetch(eventTypes.NEW_USER, { userName })
+    ).resolves.toMatchObject({
       status: HTTP_BAD_REQUEST
     });
-    await expect(fetch("addUser", { userName: "" })).resolves.toMatchObject({
+    await expect(
+      fetch(eventTypes.NEW_USER, { userName: "" })
+    ).resolves.toMatchObject({
       status: HTTP_BAD_REQUEST
+    });
+  });
+
+  it("Should provide user list", async () => {
+    const userName = "testUser";
+
+    await expect(fetch(eventTypes.GET_USER_LIST)).resolves.toMatchObject({
+      payload: {
+        users: []
+      }
+    });
+    await fetch(eventTypes.NEW_USER, { userName });
+    await expect(fetch(eventTypes.GET_USER_LIST)).resolves.toMatchObject({
+      payload: {
+        users: [userName]
+      }
     });
   });
 });
