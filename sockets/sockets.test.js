@@ -1,3 +1,4 @@
+const { addUser, getUsersList, getUserSocket } = require("../state/users");
 const io = require("socket.io-client");
 const { eventTypes } = require("./sockets");
 
@@ -74,5 +75,20 @@ describe("Signaling server websockets API tests", function() {
         users: [userName]
       }
     });
+  });
+});
+
+describe("Signaling server auxiliary functions", function() {
+  it("Should send messages to users", () => {
+    const userName1 = "testUser1";
+    const socketId1 = "111";
+    const userName2 = "testUser2";
+    const socketId2 = "222";
+    addUser(socketId1, userName1);
+    addUser(socketId2, userName2);
+
+    expect(getUsersList()).toMatchObject([userName1, userName2]);
+    expect(getUserSocket(userName1)).toBe(socketId1);
+    expect(getUserSocket(userName2)).toBe(socketId2);
   });
 });

@@ -23,11 +23,21 @@ const deleteUser = socketID => {
 
   delete users[socketID];
 };
-const getUser = () => {};
+
+/**
+ * Returns socket for a user
+ * @param {string} userName
+ */
+const getUserSocket = userName => {
+  return Object.keys(users).find(user => {
+    return users[user].userName === userName;
+  });
+};
+
 const getUsersList = () => {
   return Object.keys(users).map(user => {
     return users[user].userName;
   });
 };
 
-module.exports = { addUser, deleteUser, getUser, getUsersList };
+module.exports = { addUser, deleteUser, getUserSocket, getUsersList };
