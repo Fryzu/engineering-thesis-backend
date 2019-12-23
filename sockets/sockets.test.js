@@ -84,11 +84,16 @@ describe("Signaling server websockets API tests", function() {
     ).resolves.toMatchObject({
       status: HTTP_OK
     });
+    await expect(fetch(eventTypes.GET_CHANNEL_LIST)).resolves.toMatchObject({
+      payload: {
+        channels: [channelName]
+      }
+    });
   });
 });
 
 describe("Signaling server auxiliary functions tests", function() {
-  it("Should send messages to users", () => {
+  it("Should return users sockets", () => {
     const userName1 = "testUser1";
     const socketId1 = "111";
     const userName2 = "testUser2";

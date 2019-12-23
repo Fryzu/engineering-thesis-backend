@@ -22,10 +22,12 @@ const deleteChannel = channelName => {
   delete channels[channelName];
 };
 
-const getChannelList = () => {};
+const getChannelList = () => {
+  return Object.keys(channels);
+};
 
 const addUserToChannel = () => {};
 
 const getChannelListeners = () => {};
 
-module.exports = { openChannel };
+module.exports = { openChannel, getChannelList };

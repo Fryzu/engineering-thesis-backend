@@ -1,11 +1,12 @@
-const { openChannel } = require("../state/channels");
+const { openChannel, getChannelList } = require("../state/channels");
 const { addUser, deleteUser, getUsersList } = require("../state/users");
 
 const eventTypes = {
   TEST: "test",
   NEW_USER: "addUser",
   GET_USER_LIST: "getUserList",
-  OPEN_CHANNEL: "openChannel"
+  OPEN_CHANNEL: "openChannel",
+  GET_CHANNEL_LIST: "getChannelList"
 };
 
 const HTTP_OK = 200;
@@ -51,7 +52,6 @@ function handleWebSocketConnections(socket) {
   socket.on(eventTypes.GET_USER_LIST, (_, callback) => {
     try {
       const users = getUsersList();
-      console.warn(users);
       callback({
         status: HTTP_OK,
         message: "Successful user list get",
@@ -74,6 +74,24 @@ function handleWebSocketConnections(socket) {
       callback({
         status: HTTP_OK,
         message: `Successful created channel ${channelName}`
+      });
+    } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.GET_CHANNEL_LIST, (_, callback) => {
+    try {
+      const channels = getChannelList();
+      callback({
+        status: HTTP_OK,
+        message: "Successful channel list get",
+        payload: {
+          channels
+        }
       });
     } catch (error) {
       callback({
