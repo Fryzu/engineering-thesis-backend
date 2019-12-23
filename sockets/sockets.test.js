@@ -90,6 +90,22 @@ describe("Signaling server websockets API tests", function() {
       }
     });
   });
+
+  it("Should add users to channel listeners", async () => {
+    const channelName = "channelName";
+    fetch(eventTypes.OPEN_CHANNEL, { channelName });
+
+    await expect(
+      fetch(eventTypes.ADD_ME_TO_CHANNEL, { channelName })
+    ).resolves.toMatchObject({
+      status: HTTP_OK
+    });
+    await expect(
+      fetch(eventTypes.GET_CHANNEL_LISTENERS, { channelName })
+    ).resolves.toMatchObject({
+      status: HTTP_OK
+    });
+  });
 });
 
 describe("Signaling server auxiliary functions tests", function() {

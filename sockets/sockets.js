@@ -1,4 +1,9 @@
-const { openChannel, getChannelList } = require("../state/channels");
+const {
+  openChannel,
+  getChannelList,
+  addUserToChannel,
+  getChannelListeners
+} = require("../state/channels");
 const { addUser, deleteUser, getUsersList } = require("../state/users");
 
 const eventTypes = {
@@ -6,7 +11,9 @@ const eventTypes = {
   NEW_USER: "addUser",
   GET_USER_LIST: "getUserList",
   OPEN_CHANNEL: "openChannel",
-  GET_CHANNEL_LIST: "getChannelList"
+  GET_CHANNEL_LIST: "getChannelList",
+  ADD_ME_TO_CHANNEL: "addMeToChannel",
+  GET_CHANNEL_LISTENERS: "getChannelListeners"
 };
 
 const HTTP_OK = 200;
@@ -91,6 +98,43 @@ function handleWebSocketConnections(socket) {
         message: "Successful channel list get",
         payload: {
           channels
+        }
+      });
+    } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.ADD_ME_TO_CHANNEL, (payload, callback) => {
+    try {
+      const { channelName } = payload;
+      addUserToChannel(socket.id, channelName);
+      callback({
+        status: HTTP_OK,
+        message: `Successfuly added user to ${channelName} listeners`
+      });
+    } catch (error) {
+      console.warn(error);
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.GET_CHANNEL_LISTENERS, (payload, callback) => {
+    try {
+      const { channelName } = payload;
+
+      const listeners = getChannelListeners(channelName);
+      callback({
+        status: HTTP_OK,
+        message: "Successful channel listeners get",
+        payload: {
+          listeners
         }
       });
     } catch (error) {

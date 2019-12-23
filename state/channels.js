@@ -26,8 +26,31 @@ const getChannelList = () => {
   return Object.keys(channels);
 };
 
-const addUserToChannel = () => {};
+/**
+ * Adds a user to channel listeners
+ * @param {string} userID user socket ID
+ * @param {string} channelName
+ */
+const addUserToChannel = (userID, channelName) => {
+  if (!(channelName in channels)) throw "No such channel";
 
-const getChannelListeners = () => {};
+  const { listeners } = channels[channelName];
+  if (userID in listeners) throw "User already in channel";
 
-module.exports = { openChannel, getChannelList };
+  listeners.push(userID);
+};
+
+/**
+ * Returns channel listeners
+ * @param {string} channelName
+ */
+const getChannelListeners = channelName => {
+  return channels[channelName].listeners;
+};
+
+module.exports = {
+  openChannel,
+  getChannelList,
+  addUserToChannel,
+  getChannelListeners
+};
