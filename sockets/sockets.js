@@ -1,4 +1,4 @@
-const { addUser } = require("../state/users");
+const { addUser, deleteUser } = require("../state/users");
 
 const eventTypes = {
   TEST: "test",
@@ -16,7 +16,12 @@ function handleWebSocketConnections(socket) {
     next();
   });
 
-  // socket.on("disconnect", () => {});
+  socket.on("disconnect", () => {
+    const { id } = socket;
+    try {
+      deleteUser(id);
+    } catch {}
+  });
 
   socket.on(eventTypes.TEST, ({ testMessage }, callback) => {
     callback(testMessage);
