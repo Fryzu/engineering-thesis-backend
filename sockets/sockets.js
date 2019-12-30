@@ -3,7 +3,9 @@ const {
   getChannelList,
   addUserToChannel,
   getChannelListeners,
-  deleteChannelsOfUser
+  deleteChannelsOfUser,
+  findUsersChannel,
+  getChannelUsers
 } = require("../state/channels");
 const {
   addUser,
@@ -21,7 +23,8 @@ const eventTypes = {
   ADD_ME_TO_CHANNEL: "addMeToChannel",
   GET_CHANNEL_LISTENERS: "getChannelListeners",
   CLOSE_CHANNEL: "closeChannel",
-  SEND_TO_USER: "sendToUser"
+  SEND_TO_USER: "sendToUser",
+  SEND_TO_CHANNEL: "sendToChannel"
 };
 
 const HTTP_OK = 200;
@@ -238,6 +241,62 @@ function handleWebSocketConnections(socket, io) {
       io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
         messageType,
         message
+      });
+
+      callback({
+        status: HTTP_OK,
+        message: "Successful forwarded message"
+      });
+    } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.SEND_TO_CHANNEL, (payload, callback) => {
+    try {
+      const { messageType, message } = payload;
+      const { id } = socket;
+
+      const channel = getUserSocket();
+      const receivers = getChannelListeners(channelName);
+
+      console.warn(receivers);
+
+      // io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
+      //   messageType,
+      //   message
+      // });
+
+      callback({
+        status: HTTP_OK,
+        message: "Successful forwarded message"
+      });
+    } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.SEND_TO_CHANNEL, (payload, callback) => {
+    try {
+      const { messageType, message } = payload;
+      const { id } = socket;
+
+      const channel = findUsersChannel(`${id}`);
+      const receivers = getChannelUsers(channel);
+
+      receivers.forEach(receiver => {
+        if (receiver !== id) {
+          io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
+            messageType,
+            message
+          });
+        }
       });
 
       callback({

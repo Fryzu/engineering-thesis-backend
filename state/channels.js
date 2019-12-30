@@ -49,6 +49,19 @@ const addUserToChannel = (userID, channelName) => {
 };
 
 /**
+ * Returns channel which contains user as listener or author
+ * @param {string} userID
+ */
+const findUsersChannel = userID => {
+  return Object.keys(channels).find(channel => {
+    return (
+      channels[channel].listeners.includes(userID) ||
+      userID == channels[channel].author
+    );
+  });
+};
+
+/**
  * Returns channel listeners
  * @param {string} channelName
  */
@@ -56,10 +69,20 @@ const getChannelListeners = channelName => {
   return channels[channelName].listeners;
 };
 
+/**
+ * Returns channel listeners and author
+ * @param {string} channelName
+ */
+const getChannelUsers = channelName => {
+  return [...getChannelListeners(channelName), channels[channelName].author];
+};
+
 module.exports = {
   openChannel,
   getChannelList,
   addUserToChannel,
   getChannelListeners,
-  deleteChannelsOfUser
+  deleteChannelsOfUser,
+  findUsersChannel,
+  getChannelUsers
 };
