@@ -15,7 +15,8 @@ const eventTypes = {
   OPEN_CHANNEL: "openChannel",
   GET_CHANNEL_LIST: "getChannelList",
   ADD_ME_TO_CHANNEL: "addMeToChannel",
-  GET_CHANNEL_LISTENERS: "getChannelListeners"
+  GET_CHANNEL_LISTENERS: "getChannelListeners",
+  CLOSE_CHANNEL: "closeChannel"
 };
 
 const HTTP_OK = 200;
@@ -187,6 +188,37 @@ function handleWebSocketConnections(socket) {
         }
       });
     } catch (error) {
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.CLOSE_CHANNEL, (_, callback) => {
+    const { id } = socket;
+    try {
+      deleteChannelsOfUser(id);
+
+      const channels = getChannelList();
+      const users = getUsersList();
+      socket.broadcast.emit(eventTypes.NEW_USER, {
+        message: "One of channels has been deleted",
+        payload: {
+          channels,
+          users
+        }
+      });
+
+      callback({
+        status: HTTP_OK,
+        message: `Successfuly removed channel`,
+        payload: {
+          channels
+        }
+      });
+    } catch (error) {
+      console.warn(error);
       callback({
         status: HTTP_BAD_REQUEST,
         message: error
