@@ -18,3 +18,5 @@ app.use(router);
 server.listen(SERVER_PORT, () => {
   console.log("Server starts on port", SERVER_PORT);
 });
+
+module.exports = { io };

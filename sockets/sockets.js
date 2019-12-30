@@ -5,6 +5,7 @@ const {
   getChannelListeners
 } = require("../state/channels");
 const { addUser, deleteUser, getUsersList } = require("../state/users");
+const { io } = require("../index");
 
 const eventTypes = {
   TEST: "test",
@@ -22,6 +23,13 @@ const HTTP_BAD_REQUEST = 400;
 function handleWebSocketConnections(socket) {
   console.log(`New connection on socket ${socket.id}`);
 
+  // TEST EVENT EMITTER
+  // let i = 0;
+  // setInterval(() => {
+  //   socket.emit("test", i);
+  //   i += 1;
+  // }, 3000);
+
   socket.use((packet, next) => {
     console.log("Request: ", packet);
     next();
@@ -31,6 +39,16 @@ function handleWebSocketConnections(socket) {
     const { id } = socket;
     try {
       deleteUser(id);
+
+      const users = getUsersList();
+      const channels = getChannelList();
+      socket.broadcast.emit(eventTypes.NEW_USER, {
+        message: "New user in system",
+        payload: {
+          users,
+          channels
+        }
+      });
     } catch (error) {
       console.log(`Disconnection error: ${error}`);
     }
@@ -44,9 +62,24 @@ function handleWebSocketConnections(socket) {
     try {
       const { userName } = payload;
       addUser(socket.id, userName);
+
+      const users = getUsersList();
+      const channels = getChannelList();
+      socket.broadcast.emit(eventTypes.NEW_USER, {
+        message: "New user in system",
+        payload: {
+          users,
+          channels
+        }
+      });
+
       callback({
         status: HTTP_OK,
-        message: "User has been added successfuly"
+        message: "User has been added successfuly",
+        payload: {
+          users,
+          channels
+        }
       });
     } catch (error) {
       callback({
