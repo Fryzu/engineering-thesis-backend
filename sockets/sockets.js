@@ -2,7 +2,8 @@ const {
   openChannel,
   getChannelList,
   addUserToChannel,
-  getChannelListeners
+  getChannelListeners,
+  deleteChannelsOfUser
 } = require("../state/channels");
 const { addUser, deleteUser, getUsersList } = require("../state/users");
 const { io } = require("../index");
@@ -39,11 +40,12 @@ function handleWebSocketConnections(socket) {
     const { id } = socket;
     try {
       deleteUser(id);
+      deleteChannelsOfUser(id);
 
       const users = getUsersList();
       const channels = getChannelList();
       socket.broadcast.emit(eventTypes.NEW_USER, {
-        message: "New user in system",
+        message: "User left the system",
         payload: {
           users,
           channels
@@ -111,9 +113,23 @@ function handleWebSocketConnections(socket) {
     try {
       const { channelName } = payload;
       openChannel(channelName, socket.id);
+
+      const users = getUsersList();
+      const channels = getChannelList();
+      socket.broadcast.emit(eventTypes.NEW_USER, {
+        message: "New channel in system",
+        payload: {
+          channels,
+          users
+        }
+      });
+
       callback({
         status: HTTP_OK,
-        message: `Successful created channel ${channelName}`
+        message: `Successful created channel ${channelName}`,
+        payload: {
+          channels
+        }
       });
     } catch (error) {
       callback({

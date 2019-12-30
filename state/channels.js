@@ -16,6 +16,14 @@ const openChannel = (channelName, author) => {
   };
 };
 
+const deleteChannelsOfUser = userName => {
+  Object.keys(channels).forEach(channel => {
+    if (channels[channel].author === userName) {
+      delete channels[channel];
+    }
+  });
+};
+
 const deleteChannel = channelName => {
   if (!(channelName in channels)) throw "No such channel";
 
@@ -52,5 +60,6 @@ module.exports = {
   openChannel,
   getChannelList,
   addUserToChannel,
-  getChannelListeners
+  getChannelListeners,
+  deleteChannelsOfUser
 };
