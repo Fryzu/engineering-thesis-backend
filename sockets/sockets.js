@@ -5,8 +5,12 @@ const {
   getChannelListeners,
   deleteChannelsOfUser
 } = require("../state/channels");
-const { addUser, deleteUser, getUsersList } = require("../state/users");
-const { io } = require("../index");
+const {
+  addUser,
+  deleteUser,
+  getUsersList,
+  getUserSocket
+} = require("../state/users");
 
 const eventTypes = {
   TEST: "test",
@@ -16,13 +20,14 @@ const eventTypes = {
   GET_CHANNEL_LIST: "getChannelList",
   ADD_ME_TO_CHANNEL: "addMeToChannel",
   GET_CHANNEL_LISTENERS: "getChannelListeners",
-  CLOSE_CHANNEL: "closeChannel"
+  CLOSE_CHANNEL: "closeChannel",
+  SEND_TO_USER: "sendToUser"
 };
 
 const HTTP_OK = 200;
 const HTTP_BAD_REQUEST = 400;
 
-function handleWebSocketConnections(socket) {
+function handleWebSocketConnections(socket, io) {
   console.log(`New connection on socket ${socket.id}`);
 
   // TEST EVENT EMITTER
@@ -218,7 +223,28 @@ function handleWebSocketConnections(socket) {
         }
       });
     } catch (error) {
-      console.warn(error);
+      callback({
+        status: HTTP_BAD_REQUEST,
+        message: error
+      });
+    }
+  });
+
+  socket.on(eventTypes.SEND_TO_USER, (payload, callback) => {
+    try {
+      const { userName, messageType, message } = payload;
+
+      const receiver = getUserSocket(userName);
+      io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
+        messageType,
+        message
+      });
+
+      callback({
+        status: HTTP_OK,
+        message: "Successful forwarded message"
+      });
+    } catch (error) {
       callback({
         status: HTTP_BAD_REQUEST,
         message: error

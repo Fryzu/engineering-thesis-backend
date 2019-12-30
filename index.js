@@ -11,12 +11,10 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 // Handling WebSockets connections
-io.on("connect", handleWebSocketConnections);
+io.on("connect", socket => handleWebSocketConnections(socket, io));
 
 app.use(router);
 
 server.listen(SERVER_PORT, () => {
   console.log("Server starts on port", SERVER_PORT);
 });
-
-module.exports = { io };
