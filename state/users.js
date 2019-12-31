@@ -40,4 +40,16 @@ const getUsersList = () => {
   });
 };
 
-module.exports = { addUser, deleteUser, getUserSocket, getUsersList };
+const getUserName = socketID => {
+  if (!(socketID in users)) throw "No such user";
+
+  return users[socketID].userName;
+};
+
+module.exports = {
+  addUser,
+  deleteUser,
+  getUserSocket,
+  getUsersList,
+  getUserName
+};

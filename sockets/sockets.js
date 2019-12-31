@@ -5,13 +5,15 @@ const {
   getChannelListeners,
   deleteChannelsOfUser,
   findUsersChannel,
-  getChannelUsers
+  getChannelUsers,
+  getChannelAuthor
 } = require("../state/channels");
 const {
   addUser,
   deleteUser,
   getUsersList,
-  getUserSocket
+  getUserSocket,
+  getUserName
 } = require("../state/users");
 
 const eventTypes = {
@@ -24,7 +26,8 @@ const eventTypes = {
   GET_CHANNEL_LISTENERS: "getChannelListeners",
   CLOSE_CHANNEL: "closeChannel",
   SEND_TO_USER: "sendToUser",
-  SEND_TO_CHANNEL: "sendToChannel"
+  SEND_TO_CHANNEL: "sendToChannel",
+  ADD_USER_TO_CHANNEL: "addUserToChannel"
 };
 
 const HTTP_OK = 200;
@@ -39,6 +42,11 @@ function handleWebSocketConnections(socket, io) {
   //   socket.emit("test", i);
   //   i += 1;
   // }, 3000);
+
+  // socket.emit("addUserToChannel", {
+  //   payload: { userName: "aaa" },
+  //   message: "New channe listener"
+  // });
 
   socket.use((packet, next) => {
     console.log("Request: ", packet);
@@ -169,13 +177,22 @@ function handleWebSocketConnections(socket, io) {
   socket.on(eventTypes.ADD_ME_TO_CHANNEL, (payload, callback) => {
     try {
       const { channelName } = payload;
+
       addUserToChannel(socket.id, channelName);
+
+      const author = getChannelAuthor(channelName);
+      const { id } = socket;
+      const userName = getUserName(id);
+      io.to(`${author}`).emit(eventTypes.ADD_USER_TO_CHANNEL, {
+        payload: { userName },
+        message: "New channel listener"
+      });
+
       callback({
         status: HTTP_OK,
         message: `Successfuly added user to ${channelName} listeners`
       });
     } catch (error) {
-      console.warn(error);
       callback({
         status: HTTP_BAD_REQUEST,
         message: error
@@ -242,33 +259,6 @@ function handleWebSocketConnections(socket, io) {
         messageType,
         message
       });
-
-      callback({
-        status: HTTP_OK,
-        message: "Successful forwarded message"
-      });
-    } catch (error) {
-      callback({
-        status: HTTP_BAD_REQUEST,
-        message: error
-      });
-    }
-  });
-
-  socket.on(eventTypes.SEND_TO_CHANNEL, (payload, callback) => {
-    try {
-      const { messageType, message } = payload;
-      const { id } = socket;
-
-      const channel = getUserSocket();
-      const receivers = getChannelListeners(channelName);
-
-      console.warn(receivers);
-
-      // io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
-      //   messageType,
-      //   message
-      // });
 
       callback({
         status: HTTP_OK,
