@@ -183,6 +183,8 @@ function handleWebSocketConnections(socket, io) {
       const author = getChannelAuthor(channelName);
       const { id } = socket;
       const userName = getUserName(id);
+      const authorName = getUserName(author);
+
       io.to(`${author}`).emit(eventTypes.ADD_USER_TO_CHANNEL, {
         payload: { userName },
         message: "New channel listener"
@@ -190,7 +192,8 @@ function handleWebSocketConnections(socket, io) {
 
       callback({
         status: HTTP_OK,
-        message: `Successfuly added user to ${channelName} listeners`
+        message: `Successfuly added user to ${channelName} listeners`,
+        payload: { author: authorName }
       });
     } catch (error) {
       callback({
