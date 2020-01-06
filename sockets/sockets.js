@@ -256,11 +256,16 @@ function handleWebSocketConnections(socket, io) {
   socket.on(eventTypes.SEND_TO_USER, (payload, callback) => {
     try {
       const { userName, messageType, message } = payload;
+      const { id } = socket;
+      const from = getUserName(id);
 
       const receiver = getUserSocket(userName);
       io.to(`${receiver}`).emit(eventTypes.SEND_TO_USER, {
         messageType,
-        message
+        message: {
+          ...message,
+          from
+        }
       });
 
       callback({
