@@ -8,4 +8,4 @@ yarn start
 ```
 
 You can test it using my web app. 
-<br /> See the [web app repo](https://github.com/Fryzu/EngineeringThesisBackend)
+<br /> See the [web app repo](https://github.com/Fryzu/EngineeringThesisFrontend)
